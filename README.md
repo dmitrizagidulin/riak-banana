@@ -23,9 +23,8 @@ Installs and configures Logstash + Logstash contribs, configures riak logstash p
 
 Installs banana
 
-#### Usage:
-
-requires: vagrant
+#### Installation (using Vagrant)
+requires: [vagrant](https://www.vagrantup.com/)
 
 Vagrant box is based on Ubuntu
 
@@ -35,6 +34,16 @@ cd riak-banana
 vagrant up
 ssh-with-fwds
 ```
+
+#### Installation (manual, existing Riak+YZ)
+If you have an existing Riak 2.0 + Solr installed (including Oracle Java 7), and would like to install Banana:
+
+1) Locate the [Riak Solr webapp directory](https://github.com/basho/services-knowledgebase/blob/master/Customer%20FAQ.md#where-is-the-solr-webapp-directory).
+    Generally located in ```<riak lib dir>/yokozuna-2.0.../priv/solr/solr-webapp/```.
+
+2) ...
+
+#### Usage:
 
 Navigate to ```http://localhost:8093/internal_solr/banana/src/index.html```
 
