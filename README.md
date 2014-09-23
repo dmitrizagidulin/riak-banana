@@ -23,7 +23,7 @@ Installs and configures Logstash + Logstash contribs, configures riak logstash p
 
 Installs banana
 
-#### Installation (using Vagrant)
+### Installation (using Vagrant)
 requires: [vagrant](https://www.vagrantup.com/)
 
 Vagrant box is based on Ubuntu
@@ -35,13 +35,44 @@ vagrant up
 ssh-with-fwds
 ```
 
-#### Installation (manual, existing Riak+YZ)
+### Manual Installation (existing Riak+YZ)
+
+#### Installing Banana 
 If you have an existing Riak 2.0 + Solr installed (including Oracle Java 7), and would like to install Banana:
 
-1) Locate the [Riak Solr webapp directory](https://github.com/basho/services-knowledgebase/blob/master/Customer%20FAQ.md#where-is-the-solr-webapp-directory).
-    Generally located in ```<riak lib dir>/yokozuna-2.0.../priv/solr/solr-webapp/```.
+1. Locate the [Riak Solr webapp directory](https://github.com/basho/services-knowledgebase/blob/master/Customer%20FAQ.md#where-is-the-solr-webapp-directory).
+    Generally located in ```<riak lib dir>/yokozuna-2.0.../priv/solr/solr-webapp/webapp/```.
 
-2) ...
+2. CD to the Solr webapp directory, and clone the [banana](https://github.com/LucidWorks/banana) repo. For example:
+
+    ```bash
+    cd /usr/lib/riak/lib/yokozuna-2.0.0-0-geb4919c/priv/solr/solr-webapp/webapp
+    git clone https://github.com/LucidWorks/banana.git
+    ```
+
+3. (Still in the solr webapp directory) Copy the Dashboard .json file into the banana dashboard directory:
+
+    ```bash
+    wget https://raw.githubusercontent.com/glickbot/riak-banana/master/puppet/modules/riakbanana/templates/dashboard.json.erb
+    mv dashboard.json.erb banana/src/app/dashboards/default.json
+    ```
+4. Download and install the Logstash Solr schema:
+
+    ```bash
+    wget https://raw.githubusercontent.com/glickbot/riak-banana/master/files/logstash_logs.xml
+    curl -XPUT -i 'http://localhost:8098/search/schema/logstash_logs' -H 'content-type: application/xml' --data-binary @logstash_logs.xml
+    ```
+5. Create the index (and use the uploaded schema):
+    ```bash
+    curl -XPUT -i 'http://localhost:8098/search/index/logstash_logs' -H 'content-type: application/json' -d '{"schema":"logstash_logs"}'
+    ```
+
+6. Configure the bucket to use the ```logstash_logs``` index:
+    ```bash
+    curl -i -H 'content-type: application/json' -XPUT 'http://localhost:8098/buckets/logstash_logs/props' -d'{"props":{"search_index":"logstash_logs"}}'
+    ```
+
+#### Installing Logstash
 
 #### Usage:
 
