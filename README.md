@@ -3,9 +3,15 @@ riak-banana
 
 Riak2.0 + LucidWorks/banana
 
+#### Introduction
+Making sense of system log entries is the perfect task for a text search and indexing engine like Solr. 
+In addition to the obvious use case of searching for particular error messages, the search engine's indexing 
+and aggregation  capabilities allow for near-real-time graphing, analysis and statistics functionality, 
+which greatly helps the task of system administration.
+
 #### Status: WIP
 
-#####Issues:
+##### Issues:
 - race condition during 'vagrant up', need to run 'vagrant provision' after
 - uses ugly 'files' directory, referencing "/vagrant/files" in puppet modules, need to clean up
 - hitting local solr instead of Riak solr query interface, due to Banana requesting Solr Admin API calls
@@ -23,7 +29,7 @@ Installs and configures Logstash + Logstash contribs, configures riak logstash p
 
 Installs banana
 
-### Installation (using Vagrant)
+### Installation (full stack, using Vagrant)
 requires: [vagrant](https://www.vagrantup.com/)
 
 Vagrant box is based on Ubuntu
@@ -36,14 +42,29 @@ ssh-with-fwds
 ```
 
 ### Manual Installation (existing Riak+YZ)
+If you have an existing Riak 2.0 + Solr installed (including Oracle Java 7), and would like to install Banana
+and Logstash, follow the directions below.
+
+Riak/Banana checklist:
+
+1. Ensure Riak 2.0 is installed (we recommend using it with Oracle Java 7), and Search is enabled.
+2. Install Banana into the Solr webapp dir and create a Solr index on a Riak bucket for the log messages
+3. Install Logstash and Logstash-Contrib
+4. Configure a log input source (such as ```syslog```), and an output (here, inserted into Riak + Solr)
+5. Use the Banana dashboard to view and query the log messages (once Riak and Logstash are up and running)
 
 #### Installing Banana 
-If you have an existing Riak 2.0 + Solr installed (including Oracle Java 7), and would like to install Banana:
+The [Banana](https://github.com/LucidWorks/banana) project, by LucidWorks, is a port of the 
+ElasticSearch [Kibana](http://www.elasticsearch.org/overview/kibana/) graphing dashboard, converted and enhanced
+to make it work with Solr (instead of ElasticSearch). It provides a friendly GUI to visualize and query
+aggregated log messages stored in and indexed by Solr. In the example below, we will be using it to
+track a Solr index called ```logstash_logs```.
 
-1. Locate the [Riak Solr webapp directory](https://github.com/basho/services-knowledgebase/blob/master/Customer%20FAQ.md#where-is-the-solr-webapp-directory).
+1. Locate the Riak Solr webapp directory.
     Generally located in ```<riak lib dir>/yokozuna-2.0.../priv/solr/solr-webapp/webapp/```.
 
-2. CD to the Solr webapp directory, and clone the [banana](https://github.com/LucidWorks/banana) repo. For example:
+2. ```cd``` to the Solr webapp directory, and clone the [banana](https://github.com/LucidWorks/banana) repo. 
+    For example:
 
     ```bash
     cd /usr/lib/riak/lib/yokozuna-2.0.0-0-geb4919c/priv/solr/solr-webapp/webapp
@@ -73,6 +94,37 @@ If you have an existing Riak 2.0 + Solr installed (including Oracle Java 7), and
     ```
 
 #### Installing Logstash
+Logstash is a general purpose tool for ingesting, transforming and outputting log messages from a variety of 
+sources (for example ```syslog``` entries, Apache access logs, or Riak logs). In this example, we will use it
+to consume new ```syslog``` entries and insert them into Riak/Solr for indexing (and display via Banana).
+
+1. Download the Logstash base package, install it to ```/opt/logstash-1.4.0``` (you might have to adjust 
+    directory permissions accordingly):
+
+    ```bash
+    wget https://download.elasticsearch.org/logstash/logstash/logstash-1.4.0.tar.gz
+    tar -xvzf logstash-1.4.0.tar.gz -C /opt/
+    ```
+2. Go into the logstash directory and install logstash-contrib
+
+    ```bash
+    cd /opt/logstash-1.4.0
+    bin/plugin install contrib
+    ```
+3. (Optional) Create a config directory for Logstash. This is where the config files with
+    ```input``` and ```output``` directives will go:
+
+    ```bash
+    mkdir -p /etc/logstash
+    ```
+4. To launch Logstash, pass it in a particular configuration file (in this case, ```syslog-riak.conf``` -
+    see Configuring Logstash section below for discussion):
+
+    ```bash
+    bin/logstash agent -v -f /etc/logstash/syslog-riak.conf
+    ```
+
+#### Configuring Logstash Inputs and Outputs
 
 #### Usage:
 
