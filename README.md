@@ -1,13 +1,24 @@
 riak-banana
 ===========
 
-Riak2.0 + LucidWorks/banana
+Riak 2.0 + Riak Search/Solr + LucidWorks/banana
 
 #### Introduction
 Making sense of system log entries is the perfect task for a text search and indexing engine like Solr. 
 In addition to the obvious use case of searching for particular error messages, the search engine's indexing 
-and aggregation  capabilities allow for near-real-time graphing, analysis and statistics functionality, 
+and aggregation capabilities allow for near-real-time graphing, analysis and statistics functionality, 
 which greatly helps the task of system administration.
+
+Logstash is a general purpose tool for ingesting, transforming and outputting log messages from a variety of 
+sources (for example ```syslog``` entries, Apache access logs, or Riak or other database logs).
+
+The LucidWorks/[Banana](https://github.com/LucidWorks/banana) project is a port of the 
+ElasticSearch/[Kibana](http://www.elasticsearch.org/overview/kibana/) graphing dashboard, converted and enhanced
+to make it work with Solr (instead of ElasticSearch). It uses Logstash for capturing, transforming, and posting
+log messages to Solr, and provides a friendly GUI to visualize and query the aggregated messages stored.
+
+This project (Riak-Banana) provides Riak-specific installation and configuration instructions, 
+for using the Logstash/Banana stack with Riak Seach 2.0.
 
 #### Status: WIP. Issues:
 - race condition during 'vagrant up', need to run 'vagrant provision' after
@@ -49,11 +60,9 @@ Riak/Banana checklist:
 5. Use the Banana dashboard to view and query the log messages (once Riak and Logstash are up and running)
 
 #### Installing Banana 
-The [Banana](https://github.com/LucidWorks/banana) project, by LucidWorks, is a port of the 
-ElasticSearch [Kibana](http://www.elasticsearch.org/overview/kibana/) graphing dashboard, converted and enhanced
-to make it work with Solr (instead of ElasticSearch). It provides a friendly GUI to visualize and query
+[Banana](https://github.com/LucidWorks/banana) provides a Solr dashboard to visualize and query
 aggregated log messages stored in and indexed by Solr. In the example below, we will be using it to
-track a Solr index called ```logstash_logs```.
+track the ```logstash_logs``` index.
 
 1. Locate the Riak Solr webapp directory.
     Generally located in ```<riak lib dir>/yokozuna-2.0.../priv/solr/solr-webapp/webapp/```.
@@ -90,8 +99,8 @@ track a Solr index called ```logstash_logs```.
 
 #### Installing Logstash
 Logstash is a general purpose tool for ingesting, transforming and outputting log messages from a variety of 
-sources (for example ```syslog``` entries, Apache access logs, or Riak logs). In this example, we will use it
-to consume new ```syslog``` entries and insert them into Riak/Solr for indexing (and display via Banana).
+sources. In this example, we will use it to consume new ```syslog``` entries and insert them into Riak/Solr 
+for indexing (and display via Banana).
 
 1. Download the Logstash base package, install it to ```/opt/logstash-1.4.0``` (you might have to adjust 
     directory permissions accordingly):
