@@ -9,28 +9,23 @@ In addition to the obvious use case of searching for particular error messages, 
 and aggregation  capabilities allow for near-real-time graphing, analysis and statistics functionality, 
 which greatly helps the task of system administration.
 
-#### Status: WIP
-
-##### Issues:
+#### Status: WIP. Issues:
 - race condition during 'vagrant up', need to run 'vagrant provision' after
 - uses ugly 'files' directory, referencing "/vagrant/files" in puppet modules, need to clean up
 - hitting local solr instead of Riak solr query interface, due to Banana requesting Solr Admin API calls
 - dashboards should be stored in Riak
 - actual entry values should be pulled from Riak instead of Solr
 
-#### Notes
+### Installation (full stack, using Vagrant)
+requires: [vagrant](https://www.vagrantup.com/)
+
 The goal is to hook in LucidWorks/banana into Riak2.0's solr interface, use Riak to store dashboards, etc, and riak to submit log data.
 
 Currently Functional, needs cleaning/testing
 
-Installs and configures Riak2.0, sets up default search index for bucket 'logstash_logs'
-
-Installs and configures Logstash + Logstash contribs, configures riak logstash plugin
-
-Installs banana
-
-### Installation (full stack, using Vagrant)
-requires: [vagrant](https://www.vagrantup.com/)
+ - Installs and configures Riak2.0 (and Oracle Java 7), sets up default search index for bucket ```logstash_logs```
+ - Installs banana
+ - Installs and configures Logstash + Logstash contribs, configures riak logstash plugin
 
 Vagrant box is based on Ubuntu
 
