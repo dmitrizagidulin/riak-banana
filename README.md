@@ -99,8 +99,7 @@ track the ```logstash_logs``` index.
 
 #### Installing Logstash
 Logstash is a general purpose tool for ingesting, transforming and outputting log messages from a variety of 
-sources. In this example, we will use it to consume new ```syslog``` entries and insert them into Riak/Solr 
-for indexing (and display via Banana).
+sources.
 
 1. Download the Logstash base package, install it to ```/opt/logstash-1.4.0``` (you might have to adjust 
     directory permissions accordingly):
@@ -115,20 +114,38 @@ for indexing (and display via Banana).
     cd /opt/logstash-1.4.0
     bin/plugin install contrib
     ```
-3. (Optional) Create a config directory for Logstash. This is where the config files with
+
+#### Configuring Logstash Inputs and Outputs
+Logstash requires configuration files, to specify the source of the log messages, which transformations (if any)
+to apply to them, and where to output them.
+In this example, we will use it to consume new ```syslog``` entries and insert them into Riak/Solr 
+for indexing (and display via Banana). 
+
+1. (Optional) Create a config directory for Logstash. This is where the config files with
     ```input``` and ```output``` directives will go:
 
     ```bash
     mkdir -p /etc/logstash
     ```
-4. To launch Logstash, pass it in a particular configuration file (in this case, ```syslog-riak.conf``` -
-    see Configuring Logstash section below for discussion):
+2. Create the Riak 
+
+    ```ruby
+input {
+    syslog { port => 5140 }
+}
+output {
+    riak {
+        bucket => ["logstash_logs"]
+        nodes => {"rihanna01" => "8098"}
+    }
+}
+    ```
+
+4. To launch Logstash, pass it in a particular configuration file:
 
     ```bash
     bin/logstash agent -v -f /etc/logstash/syslog-riak.conf
     ```
-
-#### Configuring Logstash Inputs and Outputs
 
 #### Usage:
 
