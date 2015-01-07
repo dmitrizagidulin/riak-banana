@@ -49,7 +49,7 @@ class riakbanana::install inherits riakbanana {
   #}
 
   exec { 'configure bucket':
-    command => "curl -i -H 'content-type: application/json' -XPUT '${riak_url}/buckets/${index}/props' -d '{\"props:\":{\"search_index\":\"${index}\"}}'",
+    command => "curl -i -H 'content-type: application/json' -XPUT '${riak_url}/buckets/${index}/props' -d '{\"props\":{\"search_index\":\"${index}\"}}'",
     refreshonly => true
   }
 
