@@ -38,6 +38,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |vagrant|
     vagrant.vm.define name do |config|
 
       config.vm.box = "phusion/ubuntu-14.04-amd64"
+      config.vm.box_url = "https://oss-binaries.phusionpassenger.com/vagrant/boxes/latest/ubuntu-14.04-amd64-vbox.box"
 
       if Vagrant.has_plugin?("vagrant-cachier")
         config.cache.scope = :box
