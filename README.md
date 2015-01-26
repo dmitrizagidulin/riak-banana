@@ -84,8 +84,8 @@ track the ```logstash_logs``` index.
 4. Download and install the Logstash Solr schema:
 
     ```bash
-    wget https://raw.githubusercontent.com/glickbot/riak-banana/master/files/logstash_logs.xml
-    curl -XPUT -i 'http://localhost:8098/search/schema/logstash_logs' -H 'content-type: application/xml' --data-binary @logstash_logs.xml
+    wget https://raw.githubusercontent.com/glickbot/riak-banana/master/puppet/modules/riakbanana/templates/riakbanana_schema.xml.erb -O riakbanana_schema.xml
+    curl -XPUT -i 'http://localhost:8098/search/schema/logstash_logs' -H 'content-type: application/xml' --data-binary @riakbanana_schema.xml
     ```
 5. Create the index (and use the uploaded schema):
     ```bash
@@ -115,11 +115,21 @@ sources.
     bin/plugin install contrib
     ```
 
+#### Configuring Syslog
+The intricacies of ```syslog``` configuration are beyond the scope of this document. The general idea, with 
+syslog configuration, is to specify **which** events syslog should be logging, and **where** it should be logging
+them. The following sample ```/etc/rsyslog.conf``` simply says to forward *all* events on a local machine
+to port ```5140```:
+
+```
+*.*         @localhost:5140
+```
+
 #### Configuring Logstash Inputs and Outputs
 Logstash requires configuration files, to specify the source of the log messages, which transformations (if any)
 to apply to them, and where to output them.
-In this example, we will use it to consume new ```syslog``` entries and insert them into Riak/Solr 
-for indexing (and display via Banana). 
+In this example, we will use it to consume new ```syslog``` entries (that are incoming on port ```5140```) and 
+insert them into Riak/Solr for indexing (and display via Banana). 
 
 1. (Optional) Create a config directory for Logstash. This is where the config files with
     ```input``` and ```output``` directives will go:
@@ -127,7 +137,10 @@ for indexing (and display via Banana).
     ```bash
     mkdir -p /etc/logstash
     ```
-2. Create the Riak 
+2. Create a Logstash config file, which tells it to listen for incoming ```syslog``` events, and 
+    insert them into Riak (where they'll be indexed by Solr).
+
+    ```/etc/logstash/syslog-riak.conf```
 
     ```ruby
 input {
@@ -136,7 +149,7 @@ input {
 output {
     riak {
         bucket => ["logstash_logs"]
-        nodes => {"rihanna01" => "8098"}
+        nodes => {"localhost" => "8098"}
     }
 }
     ```
